@@ -8,10 +8,10 @@ import json
 app = FastAPI()
 
 # ================== SETTINGS ==================
-GITHUB_USER = "YOUR_GITHUB_USERNAME"
-GITHUB_REPO = "YOUR_REPO_NAME"
+GITHUB_USER = "kamrulhasansamol"
+GITHUB_REPO = "telegramads"
 GITHUB_JSON_PATH = "codes.json"
-GITHUB_TOKEN = "YOUR_GITHUB_PERSONAL_ACCESS_TOKEN"
+GITHUB_TOKEN = "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"
 
 SECRET_KEY = "XenoSecret2025!"  # <-- secret key, keep it safe
 
