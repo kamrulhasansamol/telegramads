@@ -1,4 +1,5 @@
 # code.py
+import os
 import aiohttp
 from fastapi import FastAPI, HTTPException, Request
 import random
@@ -11,9 +12,9 @@ app = FastAPI()
 GITHUB_USER = "kamrulhasansamol"
 GITHUB_REPO = "telegramads"
 GITHUB_JSON_PATH = "codes.json"
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # Vercel env variable
 
-SECRET_KEY = "XenoSecret2025!"  # <-- secret key, keep it safe
+SECRET_KEY = "XenoSecret2025!"  # Secret key for verification
 
 # ================== HELPERS ==================
 async def fetch_codes():
@@ -33,6 +34,7 @@ async def update_github_codes(codes_list, commit_message="Update codes"):
         "Accept": "application/vnd.github+json"
     }
     async with aiohttp.ClientSession() as session:
+        # get SHA first
         async with session.get(url, headers=headers) as resp:
             if resp.status != 200:
                 raise HTTPException(status_code=500, detail="Failed to get file SHA from GitHub")
@@ -60,7 +62,9 @@ async def get_code(request: Request):
     if not codes:
         raise HTTPException(status_code=404, detail="No codes available")
 
+    # Pick one random code
     code = random.choice(codes)
     codes.remove(code)
     await update_github_codes(codes, commit_message=f"Code {code} used")
+
     return {"code": code}
