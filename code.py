@@ -9,12 +9,11 @@ import json
 app = FastAPI()
 
 # ================== SETTINGS ==================
-GITHUB_USER = "kamrulhasansamol"
-GITHUB_REPO = "telegramads"
-GITHUB_JSON_PATH = "codes.json"
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # Vercel env variable
-
-SECRET_KEY = "XenoSecret2025!"  # Secret key for verification
+GITHUB_USER = os.getenv("GITHUB_USER")      # Vercel environment variable
+GITHUB_REPO = os.getenv("GITHUB_REPO")
+GITHUB_JSON_PATH = os.getenv("GITHUB_JSON_PATH")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+SECRET_KEY = os.getenv("SECRET_KEY")        # key for verification
 
 # ================== HELPERS ==================
 async def fetch_codes():
