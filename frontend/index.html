@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Xeno Like Tool — Ad Redirect Flow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+  <div class="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-2 text-center">Xeno Like Tool</h1>
+    <p class="text-sm text-gray-400 mb-4 text-center">Click Send Like → you will be sent to the ad link → after ad completes you'll be returned and the like will be sent.</p>
+
+    <div class="text-xs text-gray-400 mb-4 text-center">
+      Your Client ID: <span id="clientId" class="font-mono"></span>
+    </div>
+
+    <form id="likeForm" class="space-y-4" onsubmit="return false;">
+      <div>
+        <label class="block mb-1">UID:</label>
+        <input type="text" id="uid" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="Enter UID" required>
+      </div>
+      <div>
+        <label class="block mb-1">Region:</label>
+        <select id="region" class="w-full p-2 rounded bg-gray-700 text-white">
+          <option value="AG">AG</option>
+          <option value="IND">IND</option>
+          <option value="BD">BD</option>
+        </select>
+      </div>
+
+      <div class="flex gap-2">
+        <button id="sendLikeBtn" class="flex-1 bg-gradient-to-r from-red-500 to-orange-400 p-2 rounded font-bold hover:opacity-90">Send Like</button>
+        <button id="exampleBtn" class="px-3 py-2 rounded bg-gray-700 text-sm">Example</button>
+      </div>
+    </form>
+
+    <div id="resultArea" class="mt-6"></div>
+
+    <p class="text-center text-gray-400 mt-6 text-xs">Developed by <a href="https://t.me/Samol_Hasan" class="text-blue-400">Samol_Hasan</a></p>
+  </div>
+
+<script>
+  // client id
+  function getClientId() {
+    let id = localStorage.getItem("xeno_client_id");
+    if (!id) {
+      id = 'c_' + Math.random().toString(36).slice(2, 12);
+      localStorage.setItem("xeno_client_id", id);
+    }
+    return id;
+  }
+  const CLIENT_ID = getClientId();
+  document.getElementById("clientId").innerText = CLIENT_ID;
+
+  // Replace this with your actual Adstra direct link prefix.
+  // The ad network should accept a return/redirect parameter so it can redirect back to your /afterad URL.
+  // Example: https://adstra.link/your-ad?return=<ENCODED_RETURN_URL>
+  const AD_BASE = "https://www.effectivegatecpm.com/ahfxiv6z?key=6576f9ea92e8bc92420fa594f74fad2d"; // <<--- REPLACE with your adstra link
+
+  function showResult(html) {
+    document.getElementById("resultArea").innerHTML = html;
+  }
+
+  document.getElementById("sendLikeBtn").onclick = function() {
+    const uid = document.getElementById("uid").value.trim();
+    const region = document.getElementById("region").value;
+    if (!uid) { alert("Enter UID"); return; }
+
+    // build return URL that ad network will redirect to after ad finishes
+    const returnUrl = `${window.location.origin}/afterad?uid=${encodeURIComponent(uid)}&region=${encodeURIComponent(region)}&user_id=${encodeURIComponent(CLIENT_ID)}`;
+    const adUrl = `${AD_BASE}?return=${encodeURIComponent(returnUrl)}`;
+
+    // show message then redirect
+    showResult('<div class="p-4 bg-blue-700 rounded">You are being redirected to an ad. After watching you will be returned and the like will be sent automatically.</div>');
+
+    // redirect the current window (the ad provider should redirect back to returnUrl)
+    window.location.href = adUrl;
+  };
+
+  document.getElementById("exampleBtn").onclick = function() {
+    showResult('<div class="p-4 bg-gray-700 rounded">Example: AD link should be like: <code>https://adstra.link/your-ad?return=https%3A%2F%2Fyourdomain%2Fafterad%3Fuid%3D123</code></div>');
+  };
+</script>
+</body>
+</html>
