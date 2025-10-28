@@ -9,7 +9,7 @@
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
   <div class="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md">
     <h1 class="text-2xl font-bold mb-2 text-center">Xeno Like Tool</h1>
-    <p class="text-sm text-gray-400 mb-4 text-center">Click Send Like → the ad will open in a new tab → after ad completes you'll see the like status here.</p>
+    <p class="text-sm text-gray-400 mb-4 text-center">Click Send Like → the ad will open in a new tab → after ad completes you'll see the like result here.</p>
 
     <div class="text-xs text-gray-400 mb-4 text-center">
       Your Client ID: <span id="clientId" class="font-mono"></span>
@@ -41,7 +41,7 @@
   </div>
 
 <script>
-  // Get or create client id
+  // Client ID
   function getClientId() {
     let id = localStorage.getItem("xeno_client_id");
     if (!id) {
@@ -53,61 +53,25 @@
   const CLIENT_ID = getClientId();
   document.getElementById("clientId").innerText = CLIENT_ID;
 
-  // Ad base URL
   const AD_BASE = "https://www.effectivegatecpm.com/ahfxiv6z?key=6576f9ea92e8bc92420fa594f74fad2d";
 
   function showResult(html) {
     document.getElementById("resultArea").innerHTML = html;
   }
 
-  async function checkLikeStatus(uid, region) {
-    try {
-      const res = await fetch(`/api/like?uid=${encodeURIComponent(uid)}&region=${encodeURIComponent(region)}&user_id=${encodeURIComponent(CLIENT_ID)}`);
-      const data = await res.json();
-      return data;
-    } catch (err) {
-      return {status:0, message: "Network error"};
-    }
-  }
-
-  document.getElementById("sendLikeBtn").onclick = async function() {
+  document.getElementById("sendLikeBtn").onclick = function() {
     const uid = document.getElementById("uid").value.trim();
     const region = document.getElementById("region").value;
     if (!uid) { alert("Enter UID"); return; }
 
-    // build return URL (optional, if ad network uses it)
+    // Build return URL for ad network
     const returnUrl = `${window.location.origin}/afterad?uid=${encodeURIComponent(uid)}&region=${encodeURIComponent(region)}&user_id=${encodeURIComponent(CLIENT_ID)}`;
     const adUrl = `${AD_BASE}?return=${encodeURIComponent(returnUrl)}`;
 
-    // show initial message
-    showResult('<div class="p-4 bg-blue-700 rounded">The ad opened in a new tab. Waiting for like to be sent...</div>');
-
-    // open ad in new tab
+    // Open ad in new tab
     window.open(adUrl, "_blank");
 
-    // poll backend every 2 seconds for status
-    let attempts = 0;
-    const maxAttempts = 15; // max 30 seconds
-    const interval = setInterval(async () => {
-      attempts++;
-      const res = await checkLikeStatus(uid, region);
-      if (res.status === 1) {
-        clearInterval(interval);
-        const player = res.player || {};
-        const likes = res.likes || {};
-        showResult(`
-          <div class="p-4 bg-green-600 rounded">
-            ✅ Like Added Successfully<br>
-            Player: ${player.nickname || 'N/A'} (${player.uid || uid})<br>
-            Region: ${player.region || region}<br>
-            Before: ${likes.before || 'N/A'}, Added: ${likes.added_by_api || 'N/A'}, Total: ${likes.after || 'N/A'}
-          </div>
-        `);
-      } else if (attempts >= maxAttempts) {
-        clearInterval(interval);
-        showResult(`<div class="p-4 bg-red-600 rounded">⚠️ Like not confirmed. ${res.message || ''}</div>`);
-      }
-    }, 2000);
+    showResult('<div class="p-4 bg-blue-700 rounded">Ad opened in a new tab. Complete the ad, then check the like result there.</div>');
   };
 
   document.getElementById("exampleBtn").onclick = function() {
