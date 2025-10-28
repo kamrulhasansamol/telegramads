@@ -3,11 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 import aiohttp
 import os
 import json
-from datetime import datetime, timedelta
-from urllib.parse import quote_plus
 
 app = FastAPI()
 
+# Allow CORS for local testing or any frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,10 +14,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Config / Data dir
+# Data directory (optional)
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
 os.makedirs(DATA_DIR, exist_ok=True)
 
+# Like API settings
 LIKE_API_URL = "https://newlike.vercel.app/like"
 CUSTOM_HEADERS = {
     "X-API-KEY": "samol_kavach_4f8e2b7c9a1d4e6f8b2c3d5e7f9a0b1c",
@@ -27,29 +27,29 @@ CUSTOM_HEADERS = {
     "X-REQUEST-TYPE": "xeno-like"
 }
 
+# Call the external like API
 async def make_like_request(uid, region):
     try:
         params = {"uid": uid, "region": region.upper()}
         async with aiohttp.ClientSession() as session:
             async with session.get(LIKE_API_URL, params=params, headers=CUSTOM_HEADERS, timeout=15) as response:
+                text = await response.text()
+                print("DEBUG: API response:", text)  # <--- debug output
                 if response.status == 200:
                     return await response.json()
-                return {"status": 0, "message": f"API Error {response.status}"}
+                return {"status": 0, "message": f"API Error {response.status}", "raw": text}
     except Exception as e:
         return {"status": 0, "message": "Network or API error", "error": str(e)}
 
+# Direct API route (optional)
 @app.get("/api/like")
 async def like(uid: str, region: str, user_id: str = ""):
-    """Direct API: enforces nothing here — frontend handles redirect flow."""
     res = await make_like_request(uid, region)
     return res
 
+# Callback route after ad completes
 @app.get("/afterad")
 async def afterad(request: Request):
-    """This route is used as the callback/return page after the ad network redirects back.
-    Expected query params: uid, region, user_id (optional)
-    It will call the internal make_like_request and render a simple HTML result page.
-    """
     params = request.query_params
     uid = params.get("uid", "")
     region = params.get("region", "AG")
@@ -59,10 +59,10 @@ async def afterad(request: Request):
         html = "<h2>Missing UID</h2><p>No UID provided.</p>"
         return Response(content=html, media_type="text/html")
 
-    # call like API
+    # Call like API
     res = await make_like_request(uid, region)
 
-    # build result HTML
+    # Build result HTML
     if res.get("status") == 1:
         player = res.get("player", {})
         likes = res.get("likes", {})
@@ -70,7 +70,6 @@ async def afterad(request: Request):
         <html>
         <head><meta charset='utf-8'><title>Like Result</title>
         <style>body{{background:#0f172a;color:#fff;font-family:Arial;padding:24px}} .card{{background:#111827;padding:20px;border-radius:10px;max-width:600px;margin:40px auto}} .ok{{color:#34d399}}</style>
-        </style>
         </head>
         <body>
           <div class='card'>
