@@ -9,7 +9,7 @@
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
   <div class="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md">
     <h1 class="text-2xl font-bold mb-2 text-center">Xeno Like Tool</h1>
-    <p class="text-sm text-gray-400 mb-4 text-center">Click Send Like → you will be sent to the ad link → after ad completes you'll be returned and the like will be sent.</p>
+    <p class="text-sm text-gray-400 mb-4 text-center">Click Send Like → the ad will open in a new tab → after ad completes you'll be returned and the like will be sent.</p>
 
     <div class="text-xs text-gray-400 mb-4 text-center">
       Your Client ID: <span id="clientId" class="font-mono"></span>
@@ -53,10 +53,8 @@
   const CLIENT_ID = getClientId();
   document.getElementById("clientId").innerText = CLIENT_ID;
 
-  // Replace this with your actual Adstra direct link prefix.
-  // The ad network should accept a return/redirect parameter so it can redirect back to your /afterad URL.
-  // Example: https://adstra.link/your-ad?return=<ENCODED_RETURN_URL>
-  const AD_BASE = "https://www.effectivegatecpm.com/ahfxiv6z?key=6576f9ea92e8bc92420fa594f74fad2d"; // <<--- REPLACE with your adstra link
+  // Replace this with your actual Adstra direct link prefix
+  const AD_BASE = "https://www.effectivegatecpm.com/ahfxiv6z?key=6576f9ea92e8bc92420fa594f74fad2d";
 
   function showResult(html) {
     document.getElementById("resultArea").innerHTML = html;
@@ -71,11 +69,11 @@
     const returnUrl = `${window.location.origin}/afterad?uid=${encodeURIComponent(uid)}&region=${encodeURIComponent(region)}&user_id=${encodeURIComponent(CLIENT_ID)}`;
     const adUrl = `${AD_BASE}?return=${encodeURIComponent(returnUrl)}`;
 
-    // show message then redirect
-    showResult('<div class="p-4 bg-blue-700 rounded">You are being redirected to an ad. After watching you will be returned and the like will be sent automatically.</div>');
+    // show message
+    showResult('<div class="p-4 bg-blue-700 rounded">The ad will open in a new tab. After watching, you will be returned and the like will be sent automatically.</div>');
 
-    // redirect the current window (the ad provider should redirect back to returnUrl)
-    window.location.href = adUrl;
+    // open ad in new tab
+    window.open(adUrl, "_blank");
   };
 
   document.getElementById("exampleBtn").onclick = function() {
