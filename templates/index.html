@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Emote Picker</title>
+    <link rel="stylesheet" href="/static/style.css">
+  </head>
+  <body>
+    <main class="container">
+      <h1>X1LITE EMOTE BOT</h1>
+      <div class="content">
+        <aside class="sidebar">
+          <div class="controls">
+            <div class="uids">
+              <label class="uidlabel">UID 1 <input id="uid1" placeholder="uid1"></label>
+              <label class="uidlabel">UID 2 <input id="uid2" placeholder="uid2"></label>
+              <label class="uidlabel">UID 3 <input id="uid3" placeholder="uid3"></label>
+              <label class="uidlabel">UID 4 <input id="uid4" placeholder="uid4"></label>
+            </div>
+
+            <div class="teamgroup">
+              <div class="teamrow">
+                <label class="label">Team code
+                  <input id="teamcode" placeholder="e.g. 4356375">
+                </label>
+
+                <!-- Quick mode toggle -->
+                <label class="switch" title="Quick mode (fast emote)">
+                  <input type="checkbox" id="quickmode">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="buttons" id="actionButtons">
+                <button id="join">Join</button>
+                <button id="leave">Leave</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="status" class="status"></div>
+        </aside>
+
+        <main class="mainarea">
+          <div class="categories">
+            {% for cat in categories %}
+              <button class="catbtn {% if cat.name == 'All' %}active{% endif %}" data-category="{{ cat.name }}" data-emote-codes="{{ cat.emotes|join(',') }}">{{ cat.name }}</button>
+            {% endfor %}
+          </div>
+
+          <section class="grid" id="grid">
+            {% for emote in emotes %}
+              <div class="cell" data-emote-id="{{ emote.rsplit('.',1)[0] }}">
+                <img src="/emote_files/{{ emote }}" data-emote-id="{{ emote.rsplit('.',1)[0] }}" alt="{{ emote }}">
+              </div>
+            {% endfor %}
+          </section>
+        </main>
+      </div>
+
+      <footer>
+        <small class="credit"><strong>DEVELOPED BY X1LITE CHEATS</strong></small>
+      </footer>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
